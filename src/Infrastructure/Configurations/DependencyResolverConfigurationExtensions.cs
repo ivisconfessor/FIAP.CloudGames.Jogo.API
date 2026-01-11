@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Nest;
-using Elasticsearch.Net;
 
 namespace FIAP.CloudGames.Jogo.API.Infrastructure.Configurations;
 
@@ -37,16 +36,36 @@ public static class DependencyResolverConfigurationExtensions
         })
         .AddJwtBearer(options =>
         {
+            var jwtKey = configuration["Jwt:Key"] ?? throw new InvalidOperationException("Jwt:Key não está configurado");
+            var issuersKeys = configuration.GetSection("Jwt:IssuersKeys").GetChildren()
+                .ToDictionary(x => x.Key, x => x.Value ?? "");
+
             options.TokenValidationParameters = new TokenValidationParameters
             {
                 ValidateIssuer = true,
-                ValidateAudience = true,
+                ValidateAudience = true, // Valida se é para FIAP.CloudGames.Client
                 ValidateLifetime = true,
                 ValidateIssuerSigningKey = true,
-                ValidIssuer = configuration["Jwt:Issuer"],
-                ValidAudience = configuration["Jwt:Audience"],
-                IssuerSigningKey = new SymmetricSecurityKey(
-                    Encoding.UTF8.GetBytes(configuration["Jwt:Key"]))
+                ValidIssuers =
+                [
+                    configuration["Jwt:Issuer"],
+                    "FIAP.CloudGames.Usuario.API"
+                ],
+                ValidAudience = configuration["Jwt:Audience"], // FIAP.CloudGames.Client
+
+                // Resolver dinâmico para buscar a chave correta por issuer
+                IssuerSigningKeyResolver = (token, securityToken, kid, parameters) =>
+                {
+                    var issuer = securityToken?.Issuer;
+                    
+                    if (string.IsNullOrEmpty(issuer) || !issuersKeys.TryGetValue(issuer, out var key))
+                    {
+                        // Fallback para a chave padrão
+                        return [new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))];
+                    }
+
+                    return [new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key))];
+                }
             };
         });
 
