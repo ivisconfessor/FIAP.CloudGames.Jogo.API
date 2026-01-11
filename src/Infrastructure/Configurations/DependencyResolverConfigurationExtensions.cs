@@ -49,7 +49,8 @@ public static class DependencyResolverConfigurationExtensions
                 ValidIssuers =
                 [
                     configuration["Jwt:Issuer"],
-                    "FIAP.CloudGames.Usuario.API"
+                    "FIAP.CloudGames.Usuario.API",
+                    "FIAP.CloudGames.Pagamento.API"
                 ],
                 ValidAudience = configuration["Jwt:Audience"], // FIAP.CloudGames.Client
 
