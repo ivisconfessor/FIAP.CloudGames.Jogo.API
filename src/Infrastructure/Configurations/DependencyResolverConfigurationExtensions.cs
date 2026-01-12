@@ -18,15 +18,15 @@ public static class DependencyResolverConfigurationExtensions
             options.UseInMemoryDatabase("FIAPCloudGamesJogos"));
 
         // Configuração do Elasticsearch
-        var elasticsearchUrl = configuration["Elasticsearch:Url"] ?? "http://localhost:9200";
-        var connectionSettings = new ConnectionSettings(new Uri(elasticsearchUrl))
-            .DefaultIndex("games")
-            .EnableDebugMode()
-            .PrettyJson()
-            .RequestTimeout(TimeSpan.FromMinutes(2));
+        // var elasticsearchUrl = configuration["Elasticsearch:Url"] ?? "http://localhost:9200";
+        // var connectionSettings = new ConnectionSettings(new Uri(elasticsearchUrl))
+        //     .DefaultIndex("games")
+        //     .EnableDebugMode()
+        //     .PrettyJson()
+        //     .RequestTimeout(TimeSpan.FromMinutes(2));
 
-        var client = new ElasticClient(connectionSettings);
-        services.AddSingleton<IElasticClient>(client);
+        //var client = new ElasticClient(connectionSettings);
+        //services.AddSingleton<IElasticClient>(client);
 
         // Configuração do JWT
         services.AddAuthentication(options =>
