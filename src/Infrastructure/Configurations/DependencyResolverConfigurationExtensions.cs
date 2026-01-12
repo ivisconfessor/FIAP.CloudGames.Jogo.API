@@ -74,7 +74,7 @@ public static class DependencyResolverConfigurationExtensions
         services.AddAuthorization();
 
         // Registro dos serviços
-        services.AddScoped<IElasticsearchService, ElasticsearchService>();
+        // services.AddScoped<IElasticsearchService, ElasticsearchService>();
         services.AddSingleton<IEventStore, EventStore>();
         
         // CORS
